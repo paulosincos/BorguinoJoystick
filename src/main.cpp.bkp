@@ -1,0 +1,178 @@
+#include <Arduino.h>
+#include <Bounce2.h>
+#include <Joystick.h>
+
+constexpr int ADC_MIN_VALUE = 0;
+constexpr int ADC_MAX_VALUE = 1023;
+constexpr int ADC_CENTER_VALUE = (ADC_MIN_VALUE + ADC_MAX_VALUE) / 2;
+
+// Unified input mapping: one continuous pin range with an explicit type mapping.
+enum InputType {
+  INPUT_BUTTON,
+  INPUT_SWITCH
+};
+
+/*
+  Suggestion:
+  
+  State (0 or 1) for digitals/bolleans
+  Value (0.0 to 1.0) for analogs (0-1023)
+
+  InputBool e InputFloat
+*/
+
+struct InputConfig {
+  InputType type;
+  int pin;
+  int joystickButtonId;
+};
+
+const int NUM_INPUTS = 4;
+const InputConfig inputConfig[NUM_INPUTS] = {
+  {INPUT_BUTTON, 22, 0},
+  {INPUT_BUTTON, 23, 1},
+  {INPUT_SWITCH, 24, 2},
+  {INPUT_BUTTON, 25, 3}
+};
+
+Bounce inputDebouncers[NUM_INPUTS];
+
+// 4-way hat switch with 4 individual pins + GND (active LOW)
+const int NUM_HAT_PINS = 4;
+const int hatPins[NUM_HAT_PINS] = {26, 27, 28, 29};
+Bounce hatDebouncers[NUM_HAT_PINS];
+int lastHatDirection = -1; // -1 indicates no direction (centered)
+
+// Controls the toggle-switch pulse without using a blocking delay
+const int togglePulseDurationLoops = 3;
+bool togglePulseActive[NUM_INPUTS] = {false, false, false, false};
+int togglePulseCounter[NUM_INPUTS] = {0, 0, 0, 0};
+
+// Analog pins definition
+const int xAxisPin = A0;
+const int yAxisPin = A1;
+
+// Second analog directional (RX/RY) using AU/AD/AL/AR + GND
+// These are mapped to analog inputs; adjust if your board uses different pins.
+const int pinAU = A2;
+const int pinAD = A3;
+const int pinAL = A4;
+const int pinAR = A5;
+
+// Initializes the Joystick
+Joystick_ joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD, 
+                   NUM_INPUTS, 1,          // Total buttons, Total Hat Switches
+                   true, true, false,      // X Axis, Y Axis, Z Axis
+                   true, true, false,      // Rx, Ry, Rz
+                   false, false,           // Rudder, Throttle
+                   false, false, false);   // Accelerator, Brake, Steering
+
+void updateInputs() {
+  for (int i = 0; i < NUM_INPUTS; i++) {
+    inputDebouncers[i].update();
+
+    if (inputConfig[i].type == INPUT_BUTTON) {
+      if (inputDebouncers[i].fell()) {
+        joystick.setButton(inputConfig[i].joystickButtonId, 1);
+      }
+      if (inputDebouncers[i].rose()) {
+        joystick.setButton(inputConfig[i].joystickButtonId, 0);
+      }
+    } else {
+      if (inputDebouncers[i].changed()) {
+        joystick.setButton(inputConfig[i].joystickButtonId, 1);
+
+        togglePulseActive[i] = true;
+        togglePulseCounter[i] = togglePulseDurationLoops;
+      }
+
+      if (togglePulseActive[i]) {
+        togglePulseCounter[i]--;
+
+        if (togglePulseCounter[i] <= 0) {
+          joystick.setButton(inputConfig[i].joystickButtonId, 0);
+          togglePulseActive[i] = false;
+        }
+      }
+    }
+  }
+}
+
+void updateHatSwitch() {
+  int hatDirection = -1; // -1 indicates no direction (centered)
+
+  for (int i = 0; i < NUM_HAT_PINS; i++) {
+    hatDebouncers[i].update();
+
+    if (hatDebouncers[i].read() == LOW) {
+      switch (i) {
+        case 0: hatDirection = 0; break;
+        case 1: hatDirection = 90; break;
+        case 2: hatDirection = 180; break;
+        case 3: hatDirection = 270; break;
+      }
+      break;
+    }
+  }
+
+  if (hatDirection != lastHatDirection) {
+    joystick.setHatSwitch(0, hatDirection);
+    lastHatDirection = hatDirection;
+  }
+}
+
+void updateAnalogAxes() {
+  // Reads proportional values (ADC_MIN_VALUE to ADC_MAX_VALUE)
+  int xValue = analogRead(xAxisPin);
+  int yValue = analogRead(yAxisPin);
+  
+  // Sends the exact position to the computer
+  joystick.setXAxis(xValue);
+  joystick.setYAxis(yValue);
+
+  // Reads the second analog directional using the four directional pins.
+  // The two opposite inputs are combined to create a proportional value
+  // for each axis, centered around ADC_CENTER_VALUE and ranging from ADC_MIN_VALUE to ADC_MAX_VALUE.
+  int verticalRaw = analogRead(pinAU) - analogRead(pinAD);
+  int horizontalRaw = analogRead(pinAR) - analogRead(pinAL);
+
+  int ryValue = constrain(map(verticalRaw, -ADC_MAX_VALUE, ADC_MAX_VALUE, ADC_MIN_VALUE, ADC_MAX_VALUE), ADC_MIN_VALUE, ADC_MAX_VALUE);
+  int rxValue = constrain(map(horizontalRaw, -ADC_MAX_VALUE, ADC_MAX_VALUE, ADC_MIN_VALUE, ADC_MAX_VALUE), ADC_MIN_VALUE, ADC_MAX_VALUE);
+
+  joystick.setZAxis(rxValue);
+  joystick.setRzAxis(ryValue);
+}
+
+void setup() {  
+  // Initialize all inputs from the unified mapping
+  for (int i = 0; i < NUM_INPUTS; i++) {
+    inputDebouncers[i] = Bounce();
+    inputDebouncers[i].attach(inputConfig[i].pin, INPUT_PULLUP);
+    inputDebouncers[i].interval(inputConfig[i].type == INPUT_SWITCH ? 35 : 25);
+  }
+
+  for (int i = 0; i < NUM_HAT_PINS; i++) {
+    hatDebouncers[i] = Bounce();
+    hatDebouncers[i].attach(hatPins[i], INPUT_PULLUP);
+    hatDebouncers[i].interval(25);
+  }
+
+  // Configures the analog range to match the Arduino reading
+  joystick.setXAxisRange(ADC_MIN_VALUE, ADC_MAX_VALUE);
+  joystick.setYAxisRange(ADC_MIN_VALUE, ADC_MAX_VALUE);
+  joystick.setZAxisRange(ADC_MIN_VALUE, ADC_MAX_VALUE);
+  joystick.setRzAxisRange(ADC_MIN_VALUE, ADC_MAX_VALUE);
+  
+  joystick.begin();
+}
+
+void loop() {
+  updateInputs();
+  updateHatSwitch();
+  updateAnalogAxes();
+ 
+  // Updates the overall state to the PC
+  joystick.sendState(); // Optional ?????
+
+  delay(10); // Reading stability
+}
