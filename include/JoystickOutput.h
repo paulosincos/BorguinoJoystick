@@ -27,4 +27,37 @@ protected:
   GenericSignalInput<bool> &input;
 };
 
+class JoystickXAxisOutput : public JoystickOutput
+{
+public:
+  explicit JoystickXAxisOutput(Joystick_ &joystick, GenericSignalInput<uint32_t> &input);
+
+  void update() override;
+
+protected:
+  GenericSignalInput<uint32_t> &input;
+};
+
+class JoystickYAxisOutput : public JoystickOutput
+{
+public:
+  explicit JoystickYAxisOutput(Joystick_ &joystick, GenericSignalInput<uint32_t> &input);
+
+  void update() override;
+
+protected:
+  GenericSignalInput<uint32_t> &input;
+};
+
+class JoystickZAxisOutput : public JoystickOutput
+{
+public:
+  explicit JoystickZAxisOutput(Joystick_ &joystick, GenericSignalInput<uint32_t> &input);
+
+  void update() override;
+
+protected:
+  GenericSignalInput<uint32_t> &input;
+};
+
 #endif
