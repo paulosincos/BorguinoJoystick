@@ -18,46 +18,46 @@ protected:
 class JoystickButtonOutput : public JoystickOutput
 {
 public:
-  explicit JoystickButtonOutput(Joystick_ &joystick, uint8_t buttonNumber, GenericSignalInput<bool> &input);
+  explicit JoystickButtonOutput(Joystick_ &joystick, uint8_t buttonNumber, ValueProvider<bool> &input);
 
   void update() override;
 
 protected:
   uint8_t buttonNumber;
-  GenericSignalInput<bool> &input;
+  ValueProvider<bool> &input;
 };
 
 class JoystickXAxisOutput : public JoystickOutput
 {
 public:
-  explicit JoystickXAxisOutput(Joystick_ &joystick, GenericSignalInput<uint32_t> &input);
+  explicit JoystickXAxisOutput(Joystick_ &joystick, ValueProvider<uint32_t> &input);
 
   void update() override;
 
 protected:
-  GenericSignalInput<uint32_t> &input;
+  ValueProvider<uint32_t> &input;
 };
 
 class JoystickYAxisOutput : public JoystickOutput
 {
 public:
-  explicit JoystickYAxisOutput(Joystick_ &joystick, GenericSignalInput<uint32_t> &input);
+  explicit JoystickYAxisOutput(Joystick_ &joystick, ValueProvider<uint32_t> &input);
 
   void update() override;
 
 protected:
-  GenericSignalInput<uint32_t> &input;
+  ValueProvider<uint32_t> &input;
 };
 
 class JoystickZAxisOutput : public JoystickOutput
 {
 public:
-  explicit JoystickZAxisOutput(Joystick_ &joystick, GenericSignalInput<uint32_t> &input);
+  explicit JoystickZAxisOutput(Joystick_ &joystick, ValueProvider<uint32_t> &input);
 
   void update() override;
 
 protected:
-  GenericSignalInput<uint32_t> &input;
+  ValueProvider<uint32_t> &input;
 };
 
 #endif

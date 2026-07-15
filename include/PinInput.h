@@ -4,9 +4,10 @@
 #include <cstdint>
 #include <Bounce2.h>
 
+#include "AdcSpecs.h"
 #include "SignalInput.h"
 
-class DigitalPinInput : public GenericSignalInput<bool>, public UpdatableSignalInput {
+class DigitalPinInput : public SignalInput, public ValueProvider<bool> {
 public:
   explicit DigitalPinInput(uint8_t pin);
 
@@ -18,18 +19,33 @@ public:
   Bounce debouncer;
 };
 
-class AnalogPinInput : public GenericSignalInput<uint32_t>, public UpdatableSignalInput {
+class AnalogPinInput : public SignalInput, public ValueProvider<uint32_t> {
 public:
   explicit AnalogPinInput(uint8_t pin);
+  explicit AnalogPinInput(uint8_t pin, bool filterValue);
 
   uint32_t getValue() const override;
   void update() override;
 
 protected:
   uint8_t pin;
+
+  bool filterValue;
+  static constexpr size_t SAMPLE_BUFFER_SIZE = 7;
+  static constexpr uint32_t HYSTERESIS_THRESHOLD = 4;
+  static constexpr uint32_t MEDIAN_AVG_THRESHOLD = 16;
+
+  uint16_t samples[SAMPLE_BUFFER_SIZE];
+  size_t sampleCount = 0;
+  size_t sampleIndex = 0;
+  uint32_t sampleSum = 0;
+  uint32_t filteredValue = ADC_CENTER_VALUE;
+  
+  void initFilteredValue();
+  void updateFilteredValue();
 };
 
-class ComposedAnalogPinInput : public GenericSignalInput<uint32_t> {
+class ComposedAnalogPinInput : public ValueProvider<uint32_t> {
 public:
   ComposedAnalogPinInput(AnalogPinInput &negativeInput, AnalogPinInput &positiveInput);
 

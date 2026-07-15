@@ -19,7 +19,7 @@ AnalogPinInput pinA0Input(A0);
 AnalogPinInput pinA1Input(A1);
 AnalogPinInput pinA2Input(A2);
 AnalogPinInput pinA3Input(A3);
-UpdatableSignalInput* inputs[] = {&pinD2Input, &pinA0Input, &pinA1Input, &pinA2Input, &pinA3Input};
+SignalInput* inputs[] = {&pinD2Input, &pinA0Input, &pinA1Input, &pinA2Input, &pinA3Input};
 
 ComposedAnalogPinInput pinA2A3Input(pinA2Input, pinA3Input);
 
@@ -34,7 +34,7 @@ void setup() {
 }
 
 void loop() {
-  for (UpdatableSignalInput* input : inputs) {
+  for (SignalInput* input : inputs) {
     input->update();
   }
 

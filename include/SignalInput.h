@@ -4,17 +4,13 @@
 class SignalInput {
 public:
   virtual ~SignalInput() = default;
+  virtual void update() = 0;
 };
 
 template <typename T>
-class GenericSignalInput: public SignalInput {
+class ValueProvider {
 public:
   virtual T getValue() const = 0;
-};
-
-class UpdatableSignalInput {
-public:
-  virtual void update() = 0;
 };
 
 #endif
