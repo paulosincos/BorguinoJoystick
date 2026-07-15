@@ -19,13 +19,16 @@ public:
   Bounce debouncer;
 };
 
-class AnalogPinInput : public SignalInput, public ValueProvider<uint32_t> {
+class AnalogPinInput : public SignalInput, public RangedValueProvider<uint32_t> {
 public:
   explicit AnalogPinInput(uint8_t pin);
   explicit AnalogPinInput(uint8_t pin, bool filterValue);
 
   uint32_t getValue() const override;
   void update() override;
+
+  uint32_t minValue() const override;
+  uint32_t maxValue() const override;
 
 protected:
   uint8_t pin;
@@ -45,11 +48,13 @@ protected:
   void updateFilteredValue();
 };
 
-class ComposedAnalogPinInput : public ValueProvider<uint32_t> {
+class ComposedAnalogPinInput : public RangedValueProvider<uint32_t> {
 public:
   ComposedAnalogPinInput(AnalogPinInput &negativeInput, AnalogPinInput &positiveInput);
 
   uint32_t getValue() const override;
+  uint32_t minValue() const override;
+  uint32_t maxValue() const override;
 protected:
   AnalogPinInput &negativeInput;
   AnalogPinInput &positiveInput;

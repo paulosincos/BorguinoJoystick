@@ -7,9 +7,9 @@
 
 // Initializes the Joystick
 Joystick_ joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD, 
-                   1, 1,          // Total buttons, Total Hat Switches
-                   true, true, false,      // X Axis, Y Axis, Z Axis
-                   true, true, false,      // Rx, Ry, Rz
+                   1, 0,          // Total buttons, Total Hat Switches
+                   true, true, true,      // X Axis, Y Axis, Z Axis
+                   false, false, false,      // Rx, Ry, Rz
                    false, false,           // Rudder, Throttle
                    false, false, false);   // Accelerator, Brake, Steering
 
@@ -24,9 +24,9 @@ SignalInput* inputs[] = {&pinD2Input, &pinA0Input, &pinA1Input, &pinA2Input, &pi
 ComposedAnalogPinInput pinA2A3Input(pinA2Input, pinA3Input);
 
 JoystickButtonOutput joystickButtonOutput(joystick, 0, pinD2Input);
-JoystickXAxisOutput joystickXAxisOutput(joystick, pinA0Input);
-JoystickYAxisOutput joystickYAxisOutput(joystick, pinA1Input);
-JoystickZAxisOutput joystickZAxisOutput(joystick, pinA2A3Input);
+JoystickRangedOutput joystickXAxisOutput(joystick, XAxis, pinA0Input);
+JoystickRangedOutput joystickYAxisOutput(joystick, YAxis, pinA1Input);
+JoystickRangedOutput joystickZAxisOutput(joystick, ZAxis, pinA2A3Input);
 SignalOutput* outputs[] = {&joystickButtonOutput, &joystickXAxisOutput, &joystickYAxisOutput, &joystickZAxisOutput};
 
 void setup() {

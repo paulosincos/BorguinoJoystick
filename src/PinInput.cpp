@@ -32,6 +32,14 @@ uint32_t AnalogPinInput::getValue() const {
   return filteredValue;
 }
 
+uint32_t AnalogPinInput::minValue() const {
+  return ADC_MIN_VALUE;
+}
+
+uint32_t AnalogPinInput::maxValue() const {
+  return ADC_MAX_VALUE;
+}
+
 void AnalogPinInput::update() {
   // TODO: consider using pointer in init function to avoid branching in update() function
   if (filterValue) {
@@ -102,7 +110,15 @@ ComposedAnalogPinInput::ComposedAnalogPinInput(AnalogPinInput &negativeInput, An
 }
 
 uint32_t ComposedAnalogPinInput::getValue() const {
-  uint32_t negativeValue = -negativeInput.getValue(); // -1023..0
-  uint32_t positiveValue = positiveInput.getValue(); // 0..1023
-  return (ADC_MAX_VALUE + negativeValue + positiveValue) / 2; // 0..1023, where 512 is 0 negative and 0 positive
+  uint32_t negativeValue = -negativeInput.getValue();
+  uint32_t positiveValue = positiveInput.getValue();
+  return negativeValue + positiveValue;
+}
+
+uint32_t ComposedAnalogPinInput::minValue() const {
+  return -negativeInput.maxValue();
+}
+
+uint32_t ComposedAnalogPinInput::maxValue() const {
+  return positiveInput.maxValue();
 }

@@ -27,37 +27,30 @@ protected:
   ValueProvider<bool> &input;
 };
 
-class JoystickXAxisOutput : public JoystickOutput
-{
-public:
-  explicit JoystickXAxisOutput(Joystick_ &joystick, ValueProvider<uint32_t> &input);
-
-  void update() override;
-
-protected:
-  ValueProvider<uint32_t> &input;
+enum JoystickRangedOutputType {
+    Accelerator,
+    Brake,
+    RotateXAxis,
+    RotateYAxis,
+    RotateZAxis,
+    Rudder,
+    Steering,
+    Throttle,
+    XAxis,
+    YAxis,
+    ZAxis,
 };
 
-class JoystickYAxisOutput : public JoystickOutput
+class JoystickRangedOutput : public JoystickOutput
 {
 public:
-  explicit JoystickYAxisOutput(Joystick_ &joystick, ValueProvider<uint32_t> &input);
+  explicit JoystickRangedOutput(Joystick_ &joystick, JoystickRangedOutputType outputType, RangedValueProvider<uint32_t> &input);
 
   void update() override;
 
 protected:
-  ValueProvider<uint32_t> &input;
-};
-
-class JoystickZAxisOutput : public JoystickOutput
-{
-public:
-  explicit JoystickZAxisOutput(Joystick_ &joystick, ValueProvider<uint32_t> &input);
-
-  void update() override;
-
-protected:
-  ValueProvider<uint32_t> &input;
+  JoystickRangedOutputType outputType;
+  RangedValueProvider<uint32_t> &input;
 };
 
 #endif
