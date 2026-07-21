@@ -1,20 +1,8 @@
 #include <Arduino.h>
 
-#include "AdcSpecs.h"
-#include "PinInput.h"
+#include "inputs/AnalogPinInput.h"
 
-DigitalPinInput::DigitalPinInput(uint8_t pin) : pin(pin) {
-  debouncer.attach(pin, INPUT_PULLUP);
-  debouncer.interval(25);
-}
-
-bool DigitalPinInput::getValue() const {
-  return !debouncer.read();
-}
-
-void DigitalPinInput::update() {
-  debouncer.update();
-}
+namespace borguino::inputs {
 
 AnalogPinInput::AnalogPinInput(uint8_t pin) : AnalogPinInput(pin, false) {
 }
@@ -41,7 +29,6 @@ uint32_t AnalogPinInput::maxValue() const {
 }
 
 void AnalogPinInput::update() {
-  // TODO: consider using pointer in init function to avoid branching in update() function
   if (filterValue) {
     updateFilteredValue();
   }
@@ -106,19 +93,4 @@ void AnalogPinInput::updateFilteredValue() {
   }
 }
 
-ComposedAnalogPinInput::ComposedAnalogPinInput(AnalogPinInput &negativeInput, AnalogPinInput &positiveInput) : negativeInput(negativeInput), positiveInput(positiveInput) {
-}
-
-uint32_t ComposedAnalogPinInput::getValue() const {
-  uint32_t negativeValue = -negativeInput.getValue();
-  uint32_t positiveValue = positiveInput.getValue();
-  return negativeValue + positiveValue;
-}
-
-uint32_t ComposedAnalogPinInput::minValue() const {
-  return -negativeInput.maxValue();
-}
-
-uint32_t ComposedAnalogPinInput::maxValue() const {
-  return positiveInput.maxValue();
-}
+}  // namespace borguino::inputs

@@ -1,24 +1,14 @@
-#ifndef PIN_INPUT_H
-#define PIN_INPUT_H
+#ifndef BORGUINO_INPUTS_ANALOG_PIN_INPUT_H
+#define BORGUINO_INPUTS_ANALOG_PIN_INPUT_H
 
+#include <cstddef>
 #include <cstdint>
-#include <Bounce2.h>
 
 #include "AdcSpecs.h"
 #include "SignalInput.h"
 #include "ValueProvider.h"
 
-class DigitalPinInput : public SignalInput, public ValueProvider<bool> {
-public:
-  explicit DigitalPinInput(uint8_t pin);
-
-  bool getValue() const override;
-  void update() override;
-
-  protected:
-  uint8_t pin;
-  Bounce debouncer;
-};
+namespace borguino::inputs {
 
 class AnalogPinInput : public SignalInput, public RangedValueProvider<uint32_t> {
 public:
@@ -44,20 +34,11 @@ protected:
   size_t sampleIndex = 0;
   uint32_t sampleSum = 0;
   uint32_t filteredValue = ADC_CENTER_VALUE;
-  
+
   void initFilteredValue();
   void updateFilteredValue();
 };
 
-class ComposedAnalogPinInput : public RangedValueProvider<uint32_t> {
-public:
-  ComposedAnalogPinInput(AnalogPinInput &negativeInput, AnalogPinInput &positiveInput);
+}  // namespace borguino::inputs
 
-  uint32_t getValue() const override;
-  uint32_t minValue() const override;
-  uint32_t maxValue() const override;
-protected:
-  AnalogPinInput &negativeInput;
-  AnalogPinInput &positiveInput;
-};
 #endif
