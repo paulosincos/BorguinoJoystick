@@ -7,6 +7,7 @@
 
 #include "PinInput.h"
 #include "SignalOutput.h"
+#include "ValueProvider.h"
 
 class JoystickOutput : public SignalOutput
 {

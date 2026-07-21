@@ -6,6 +6,7 @@
 
 #include "AdcSpecs.h"
 #include "SignalInput.h"
+#include "ValueProvider.h"
 
 class DigitalPinInput : public SignalInput, public ValueProvider<bool> {
 public:
