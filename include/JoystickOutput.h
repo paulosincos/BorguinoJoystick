@@ -1,6 +1,8 @@
 #ifndef JOYSTICK_OUTPUT_H
 #define JOYSTICK_OUTPUT_H
 
+#include <cstddef>
+#include <cstdint>
 #include <Joystick.h>
 
 #include "PinInput.h"
@@ -51,6 +53,23 @@ public:
 protected:
   JoystickRangedOutputType outputType;
   RangedValueProvider<uint32_t> &input;
+};
+
+class JoystickHatOutput : public JoystickOutput
+{
+public:
+  explicit JoystickHatOutput(Joystick_ &joystick, uint8_t hatNumber, ValueProvider<bool> *const *inputs, size_t inputCount, bool combineInputs);
+
+  void update() override;
+
+protected:
+  int16_t getHatDirection() const;
+
+  uint8_t hatNumber;
+  ValueProvider<bool> *const *inputs;
+  size_t inputCount;
+  bool combineInputs;
+  int16_t lastHatDirection;
 };
 
 #endif
