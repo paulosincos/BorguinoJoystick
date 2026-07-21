@@ -9,7 +9,7 @@ namespace borg_inputs = borguino::inputs;
 namespace borg_outputs = borguino::outputs;
 
 // Initializes the Joystick
-Joystick_ joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD, 
+Joystick_ joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD,
                    1, 1,          // Total buttons, Total Hat Switches
                    true, true, true,      // X Axis, Y Axis, Z Axis
                    false, false, false,      // Rx, Ry, Rz

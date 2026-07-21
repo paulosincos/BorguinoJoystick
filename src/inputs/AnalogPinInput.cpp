@@ -59,7 +59,7 @@ void AnalogPinInput::updateFilteredValue() {
 
   uint32_t average = sampleSum / sampleCount;
 
-  uint16_t sorted[SAMPLE_BUFFER_SIZE];
+  uint16_t sorted[SAMPLE_BUFFER_SIZE] = {};
   size_t sortCount = sampleCount;
   for (size_t i = 0; i < sortCount; ++i) {
     sorted[i] = samples[i];
