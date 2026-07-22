@@ -44,6 +44,7 @@ void AnalogPinInput::initFilteredValue() {
   filteredValue = ADC_CENTER_VALUE;
 }
 
+// [Vibe-Coded]
 uint32_t AnalogPinInput::applyCenteredDeadzone(uint32_t value) const {
   uint32_t clampedValue = value;
   if (clampedValue < ADC_MIN_VALUE) {
@@ -92,6 +93,7 @@ void AnalogPinInput::pushSampleToWindow(uint16_t sample) {
   sampleIndex = (sampleIndex + 1) % SAMPLE_BUFFER_SIZE;
 }
 
+// [Vibe-Coded]
 uint32_t AnalogPinInput::computeMovingAverage() const {
   if (sampleCount == 0) {
     return ADC_CENTER_VALUE;
@@ -99,6 +101,7 @@ uint32_t AnalogPinInput::computeMovingAverage() const {
   return sampleSum / sampleCount;
 }
 
+// [Vibe-Coded]
 uint32_t AnalogPinInput::computeMedianFromWindow() const {
   if (sampleCount == 0) {
     return ADC_CENTER_VALUE;
@@ -128,6 +131,7 @@ uint32_t AnalogPinInput::computeMedianFromWindow() const {
   return median;
 }
 
+// [Vibe-Coded]
 uint32_t AnalogPinInput::selectRobustTarget(uint32_t average, uint32_t median) const {
   uint32_t targetValue = median;
   const uint32_t avgMedianDistance = (average > median) ? (average - median) : (median - average);
@@ -137,6 +141,7 @@ uint32_t AnalogPinInput::selectRobustTarget(uint32_t average, uint32_t median) c
   return targetValue;
 }
 
+// [Vibe-Coded]
 uint32_t AnalogPinInput::applyHysteresisStep(uint32_t current, uint32_t target) const {
   if (current == ADC_CENTER_VALUE) {
     return target;

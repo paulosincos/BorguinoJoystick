@@ -11,6 +11,7 @@ JoystickHatOutput::JoystickHatOutput(Joystick_ &joystick, uint8_t hatNumber, Val
     : JoystickOutput(joystick), hatNumber(hatNumber), inputs(inputs), inputCount(inputCount), combineInputs(combineInputs), lastHatDirection(-2) {
 }
 
+// [Vibe-Coded]
 int16_t JoystickHatOutput::getHatDirection() const {
   if (inputCount == 0 || inputs == nullptr) {
     return -1;
