@@ -1,6 +1,7 @@
 #include "Engine.h"
 
 #include <Keyboard.h>
+#include <Mouse.h>
 
 #include "Config.h"
 
@@ -8,6 +9,7 @@ namespace borguino::engine {
 
 void setup() {
   Keyboard.begin();
+  Mouse.begin();
   borguino::config::joystick.begin();
 }
 
