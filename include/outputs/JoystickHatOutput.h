@@ -16,10 +16,10 @@ public:
   explicit JoystickHatOutput(Joystick_ &joystick, uint8_t hatNumber, ValueProvider<bool> *const *inputs, size_t inputCount, bool combineInputs);
 
   void update() override;
-  void setValue(int16_t value);
 
 protected:
   int16_t getHatDirection() const;
+  void setValue(int16_t value);
 
   uint8_t hatNumber;
   ValueProvider<bool> *const *inputs;

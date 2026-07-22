@@ -27,9 +27,11 @@ public:
   explicit JoystickRangedOutput(Joystick_ &joystick, JoystickRangedOutputType outputType, RangedValueProvider<uint32_t> &input);
 
   void update() override;
-  void setValue(uint32_t value);
 
 protected:
+  void setRange(uint32_t minValue, uint32_t maxValue);
+  void setValue(uint32_t value);
+  
   JoystickRangedOutputType outputType;
   RangedValueProvider<uint32_t> &input;
   uint32_t lastValue = 0;
