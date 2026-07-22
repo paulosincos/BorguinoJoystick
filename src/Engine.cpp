@@ -1,10 +1,13 @@
 #include "Engine.h"
 
+#include <Keyboard.h>
+
 #include "Config.h"
 
 namespace borguino::engine {
 
 void setup() {
+  Keyboard.begin();
   borguino::config::joystick.begin();
 }
 
