@@ -3,22 +3,28 @@
 
 #include <cstdint>
 
-#include "inputs/AnalogPinInput.h"
 #include "ValueProvider.h"
 
 namespace borguino::transformers {
 
 class ComposedAnalogAxis : public RangedValueProvider<uint32_t> {
 public:
-  ComposedAnalogAxis(inputs::AnalogPinInput &firstInput, inputs::AnalogPinInput &secondInput);
+  ComposedAnalogAxis(RangedValueProvider<uint32_t> &rangeAInput, RangedValueProvider<uint32_t> &rangeBInput);
 
   uint32_t getValue() const override;
   uint32_t minValue() const override;
   uint32_t maxValue() const override;
 
 protected:
-  inputs::AnalogPinInput &firstInput;
-  inputs::AnalogPinInput &secondInput;
+  RangedValueProvider<uint32_t> &rangeAInput;
+  RangedValueProvider<uint32_t> &rangeBInput;
+
+  uint32_t rangeAMin = 0;
+  uint32_t rangeBMin = 0;
+  uint32_t rangeASpan = 0;
+  uint32_t rangeBSpan = 0;
+  uint32_t axisMaxValue = 0;
+  uint32_t axisCenterValue = 0;
 };
 
 }  // namespace borguino::transformers
