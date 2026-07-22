@@ -1,13 +1,7 @@
 #include "outputs/JoystickHatOutput.h"
 
-#include <cmath>
-
 namespace {
-constexpr float PI_VALUE = PI;
-constexpr float RADIANS_TO_DEGREES_FACTOR = 180.0f / PI_VALUE;
-constexpr float DEGREES_TO_RADIANS_FACTOR = PI_VALUE / 180.0f;
 constexpr float FULL_CIRCLE_DEGREES = 360.0f;
-constexpr float ZERO_VECTOR_EPSILON = 0.0001f;
 constexpr float HALF_DEGREE = 0.5f;
 }
 
@@ -25,9 +19,8 @@ int16_t JoystickHatOutput::getHatDirection() const {
   const float stepDegrees = FULL_CIRCLE_DEGREES / static_cast<float>(inputCount);
 
   int firstActiveInput = -1;
+  int secondActiveInput = -1;
   int activeCount = 0;
-  float vectorX = 0.0f;
-  float vectorY = 0.0f;
 
   for (size_t i = 0; i < inputCount; ++i) {
     if (!inputs[i]->getValue()) {
@@ -40,14 +33,9 @@ int16_t JoystickHatOutput::getHatDirection() const {
 
     ++activeCount;
 
-    if (!combineInputs) {
-      continue;
+    if (secondActiveInput < 0 && static_cast<int>(i) != firstActiveInput) {
+      secondActiveInput = static_cast<int>(i);
     }
-
-    const float angleDegrees = static_cast<float>(i) * stepDegrees;
-    const float angleRadians = angleDegrees * DEGREES_TO_RADIANS_FACTOR;
-    vectorX += std::cos(angleRadians);
-    vectorY += std::sin(angleRadians);
   }
 
   if (activeCount == 0) {
@@ -59,16 +47,36 @@ int16_t JoystickHatOutput::getHatDirection() const {
     return static_cast<int16_t>(baseDirection % 360);
   }
 
-  if (std::fabs(vectorX) < ZERO_VECTOR_EPSILON && std::fabs(vectorY) < ZERO_VECTOR_EPSILON) {
+  if (activeCount > 2 || secondActiveInput < 0) {
     return -1;
   }
 
-  float direction = std::atan2(vectorY, vectorX) * RADIANS_TO_DEGREES_FACTOR;
-  if (direction < 0.0f) {
-    direction += FULL_CIRCLE_DEGREES;
+  const int first = firstActiveInput;
+  const int second = secondActiveInput;
+  const int indexDistance = (first > second) ? (first - second) : (second - first);
+  const bool isAdjacent = (indexDistance == 1) || (indexDistance == static_cast<int>(inputCount) - 1);
+  if (!isAdjacent) {
+    return -1;
   }
 
-  const int normalizedDirection = static_cast<int>(direction + HALF_DEGREE) % 360;
+  float firstAngle = static_cast<float>(first) * stepDegrees;
+  float secondAngle = static_cast<float>(second) * stepDegrees;
+
+  // Handle wrap-around adjacency (e.g., last index with index 0) before averaging.
+  if ((firstAngle > secondAngle ? (firstAngle - secondAngle) : (secondAngle - firstAngle)) > (FULL_CIRCLE_DEGREES / 2.0f)) {
+    if (firstAngle < secondAngle) {
+      firstAngle += FULL_CIRCLE_DEGREES;
+    } else {
+      secondAngle += FULL_CIRCLE_DEGREES;
+    }
+  }
+
+  float averagedDirection = (firstAngle + secondAngle) / 2.0f;
+  if (averagedDirection >= FULL_CIRCLE_DEGREES) {
+    averagedDirection -= FULL_CIRCLE_DEGREES;
+  }
+
+  const int normalizedDirection = static_cast<int>(averagedDirection + HALF_DEGREE) % 360;
   return static_cast<int16_t>(normalizedDirection);
 }
 
