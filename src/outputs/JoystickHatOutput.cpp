@@ -8,13 +8,14 @@ constexpr float HALF_DEGREE = 0.5f;
 namespace borguino::outputs {
 
 JoystickHatOutput::JoystickHatOutput(Joystick_ &joystick, uint8_t hatNumber, ValueProvider<bool> *const *inputs, size_t inputCount, bool combineInputs)
-    : JoystickOutput(joystick), hatNumber(hatNumber), inputs(inputs), inputCount(inputCount), combineInputs(combineInputs), lastHatDirection(-2) {
+    : JoystickOutput(joystick), hatNumber(hatNumber), inputs(inputs), inputCount(inputCount), combineInputs(combineInputs) {
+  setValue(lastHatDirection);
 }
 
 // [Vibe-Coded]
 int16_t JoystickHatOutput::getHatDirection() const {
   if (inputCount == 0 || inputs == nullptr) {
-    return -1;
+    return HAT_CENTERED;
   }
 
   const float stepDegrees = FULL_CIRCLE_DEGREES / static_cast<float>(inputCount);
@@ -40,7 +41,7 @@ int16_t JoystickHatOutput::getHatDirection() const {
   }
 
   if (activeCount == 0) {
-    return -1;
+    return HAT_CENTERED;
   }
 
   if (!combineInputs || activeCount == 1) {
@@ -49,7 +50,7 @@ int16_t JoystickHatOutput::getHatDirection() const {
   }
 
   if (activeCount > 2 || secondActiveInput < 0) {
-    return -1;
+    return HAT_CENTERED;
   }
 
   const int first = firstActiveInput;
@@ -57,7 +58,7 @@ int16_t JoystickHatOutput::getHatDirection() const {
   const int indexDistance = (first > second) ? (first - second) : (second - first);
   const bool isAdjacent = (indexDistance == 1) || (indexDistance == static_cast<int>(inputCount) - 1);
   if (!isAdjacent) {
-    return -1;
+    return HAT_CENTERED;
   }
 
   float firstAngle = static_cast<float>(first) * stepDegrees;
@@ -87,8 +88,12 @@ void JoystickHatOutput::update() {
     return;
   }
 
-  joystick.setHatSwitch(hatNumber, hatDirection);
+  setValue(hatDirection);
   lastHatDirection = hatDirection;
+}
+
+void JoystickHatOutput::setValue(int16_t value) {
+  joystick.setHatSwitch(hatNumber, value);
 }
 
 }  // namespace borguino::outputs

@@ -11,9 +11,12 @@ namespace borguino::outputs {
 
 class JoystickHatOutput : public JoystickOutput {
 public:
+  static constexpr int16_t HAT_CENTERED = -1;
+
   explicit JoystickHatOutput(Joystick_ &joystick, uint8_t hatNumber, ValueProvider<bool> *const *inputs, size_t inputCount, bool combineInputs);
 
   void update() override;
+  void setValue(int16_t value);
 
 protected:
   int16_t getHatDirection() const;
@@ -22,7 +25,7 @@ protected:
   ValueProvider<bool> *const *inputs;
   size_t inputCount;
   bool combineInputs;
-  int16_t lastHatDirection;
+  int16_t lastHatDirection = HAT_CENTERED;
 };
 
 }  // namespace borguino::outputs

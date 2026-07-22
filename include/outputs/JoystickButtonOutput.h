@@ -13,10 +13,12 @@ public:
   explicit JoystickButtonOutput(Joystick_ &joystick, uint8_t buttonNumber, ValueProvider<bool> &input);
 
   void update() override;
+  void setValue(bool value);
 
 protected:
   uint8_t buttonNumber;
   ValueProvider<bool> &input;
+  bool lastValue = false;
 };
 
 }  // namespace borguino::outputs

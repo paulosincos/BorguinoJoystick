@@ -6,6 +6,7 @@ JoystickRangedOutput::JoystickRangedOutput(Joystick_ &joystick, JoystickRangedOu
     : JoystickOutput(joystick), outputType(outputType), input(input) {
   auto minValue = input.minValue();
   auto maxValue = input.maxValue();
+  lastValue = minValue;
   switch (outputType) {
     case Accelerator:
       joystick.setAcceleratorRange(minValue, maxValue);
@@ -41,10 +42,21 @@ JoystickRangedOutput::JoystickRangedOutput(Joystick_ &joystick, JoystickRangedOu
       joystick.setZAxisRange(minValue, maxValue);
       break;
   }
+
+  setValue(lastValue);
 }
 
 void JoystickRangedOutput::update() {
   auto value = input.getValue();
+  if (value == lastValue) {
+    return;
+  }
+
+  setValue(value);
+  lastValue = value;
+}
+
+void JoystickRangedOutput::setValue(uint32_t value) {
   switch (outputType) {
     case Accelerator:
       joystick.setAccelerator(value);

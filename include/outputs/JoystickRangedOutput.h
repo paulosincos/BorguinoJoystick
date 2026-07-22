@@ -27,10 +27,12 @@ public:
   explicit JoystickRangedOutput(Joystick_ &joystick, JoystickRangedOutputType outputType, RangedValueProvider<uint32_t> &input);
 
   void update() override;
+  void setValue(uint32_t value);
 
 protected:
   JoystickRangedOutputType outputType;
   RangedValueProvider<uint32_t> &input;
+  uint32_t lastValue = 0;
 };
 
 }  // namespace borguino::outputs
