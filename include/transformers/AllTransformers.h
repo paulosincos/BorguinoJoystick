@@ -4,5 +4,7 @@
 #include "transformers/AnalogToDigitalTransform.h"
 #include "transformers/ComposedAnalogAxis.h"
 #include "transformers/DigitalToAnalogTransform.h"
+#include "transformers/PushButtonToToggleSwitchTransform.h"
+#include "transformers/ToggleSwitchToPushButtonTransform.h"
 
 #endif
