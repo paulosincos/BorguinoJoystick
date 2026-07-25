@@ -4,10 +4,14 @@
 
 namespace borguino::inputs {
 
-AnalogPinInput::AnalogPinInput(uint8_t pin) : AnalogPinInput(pin, false) {
-}
-
-AnalogPinInput::AnalogPinInput(uint8_t pin, bool filterValue) : pin(pin), filterValue(filterValue) {
+AnalogPinInput::AnalogPinInput(uint8_t pin,
+                               bool filterValue,
+                               uint32_t hysteresisThreshold,
+                               uint32_t medianAvgThreshold)
+    : pin(pin),
+      filterValue(filterValue),
+      hysteresisThreshold(hysteresisThreshold),
+      medianAvgThreshold(medianAvgThreshold) {
   if (filterValue) {
     initFilteredValue();
   }
@@ -98,7 +102,7 @@ uint32_t AnalogPinInput::computeMedianFromWindow() const {
 uint32_t AnalogPinInput::selectRobustTarget(uint32_t average, uint32_t median) const {
   uint32_t targetValue = median;
   const uint32_t avgMedianDistance = (average > median) ? (average - median) : (median - average);
-  if (avgMedianDistance <= MEDIAN_AVG_THRESHOLD) {
+  if (avgMedianDistance <= medianAvgThreshold) {
     targetValue = (average + median) / 2;
   }
   return targetValue;
@@ -106,16 +110,20 @@ uint32_t AnalogPinInput::selectRobustTarget(uint32_t average, uint32_t median) c
 
 // [Vibe-Coded]
 uint32_t AnalogPinInput::applyHysteresisStep(uint32_t current, uint32_t target) const {
+  if (hysteresisThreshold == 0) {
+    return target;
+  }
+
   if (current == ADC_CENTER_VALUE) {
     return target;
   }
 
   const int32_t delta = int32_t(target) - int32_t(current);
-  if (delta > int32_t(HYSTERESIS_THRESHOLD)) {
-    return current + HYSTERESIS_THRESHOLD;
+  if (delta > int32_t(hysteresisThreshold)) {
+    return current + hysteresisThreshold;
   }
-  if (delta < -int32_t(HYSTERESIS_THRESHOLD)) {
-    return current - HYSTERESIS_THRESHOLD;
+  if (delta < -int32_t(hysteresisThreshold)) {
+    return current - hysteresisThreshold;
   }
 
   return current;

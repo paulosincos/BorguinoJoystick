@@ -12,8 +12,10 @@ namespace borguino::inputs {
 
 class AnalogPinInput : public SignalInput, public RangedValueProvider<uint32_t> {
 public:
-  explicit AnalogPinInput(uint8_t pin);
-  explicit AnalogPinInput(uint8_t pin, bool filterValue);
+  explicit AnalogPinInput(uint8_t pin,
+                          bool filterValue = false,
+                          uint32_t hysteresisThreshold = 4,
+                          uint32_t medianAvgThreshold = 16);
 
   uint32_t getValue() const override;
   void update() override;
@@ -26,8 +28,8 @@ protected:
 
   bool filterValue;
   static constexpr size_t SAMPLE_BUFFER_SIZE = 7;
-  static constexpr uint32_t HYSTERESIS_THRESHOLD = 4;
-  static constexpr uint32_t MEDIAN_AVG_THRESHOLD = 16;
+  uint32_t hysteresisThreshold = 4;
+  uint32_t medianAvgThreshold = 16;
 
   uint16_t samples[SAMPLE_BUFFER_SIZE];
   size_t sampleCount = 0;
