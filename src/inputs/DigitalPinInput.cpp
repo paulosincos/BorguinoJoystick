@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 #include "inputs/DigitalPinInput.h"
 
 namespace {
@@ -8,8 +6,8 @@ constexpr uint32_t DIGITAL_PIN_DEBOUNCE_INTERVAL_MS = 25U;
 
 namespace borguino::inputs {
 
-DigitalPinInput::DigitalPinInput(uint8_t pin) : pin(pin) {
-  debouncer.attach(pin, INPUT_PULLUP);
+DigitalPinInput::DigitalPinInput(uint8_t pin, int mode) : pin(pin) {
+  debouncer.attach(pin, mode);
   debouncer.interval(DIGITAL_PIN_DEBOUNCE_INTERVAL_MS);
 }
 
