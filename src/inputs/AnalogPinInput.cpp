@@ -4,14 +4,37 @@
 
 namespace borguino::inputs {
 
+namespace {
+
+uint32_t mapRange(uint32_t value, uint32_t inMin, uint32_t inMax,
+                  uint32_t outMin, uint32_t outMax) {
+  if (inMax <= inMin) {
+    return outMin;
+  }
+
+  const uint64_t inSpan = static_cast<uint64_t>(inMax) - static_cast<uint64_t>(inMin);
+  const uint64_t outSpan = static_cast<uint64_t>(outMax) - static_cast<uint64_t>(outMin);
+  const uint64_t scaled = static_cast<uint64_t>(value - inMin) * outSpan;
+  return static_cast<uint32_t>(static_cast<uint64_t>(outMin) + (scaled / inSpan));
+}
+
+}  // namespace
+
 AnalogPinInput::AnalogPinInput(uint8_t pin,
                                bool filterValue,
                                uint32_t hysteresisThreshold,
-                               uint32_t medianAvgThreshold)
+                               uint32_t medianAvgThreshold,
+                               uint8_t deadzonePercentage,
+                               uint8_t centerPercentage,
+                               bool normalizeOutsideDeadzone)
     : pin(pin),
       filterValue(filterValue),
       hysteresisThreshold(hysteresisThreshold),
-      medianAvgThreshold(medianAvgThreshold) {
+      medianAvgThreshold(medianAvgThreshold),
+      deadzonePercentage(deadzonePercentage > 100 ? 100 : deadzonePercentage),
+      normalizeOutsideDeadzone(normalizeOutsideDeadzone) {
+  initDeadzoneBounds(centerPercentage);
+
   if (filterValue) {
     initFilteredValue();
   }
@@ -108,6 +131,51 @@ uint32_t AnalogPinInput::selectRobustTarget(uint32_t average, uint32_t median) c
   return targetValue;
 }
 
+void AnalogPinInput::initDeadzoneBounds(uint8_t centerPercentage) {
+  if (centerPercentage > 100) {
+    centerPercentage = 100;
+  }
+
+  const uint32_t rangeMin = ADC_MIN_VALUE;
+  const uint32_t rangeMax = ADC_MAX_VALUE;
+  const uint32_t span = rangeMax - rangeMin;
+  centerValue = rangeMin + static_cast<uint32_t>((static_cast<uint64_t>(span) * centerPercentage) / 100);
+
+  const uint32_t deadzoneRadius = static_cast<uint32_t>((static_cast<uint64_t>(span) * deadzonePercentage) / 200);
+  deadzoneLowerBound = (centerValue > deadzoneRadius) ? (centerValue - deadzoneRadius) : rangeMin;
+
+  const uint64_t upper64 = static_cast<uint64_t>(centerValue) + static_cast<uint64_t>(deadzoneRadius);
+  deadzoneUpperBound = (upper64 > rangeMax) ? rangeMax : static_cast<uint32_t>(upper64);
+}
+
+uint32_t AnalogPinInput::applyDeadzone(uint32_t value) const {
+  if (deadzonePercentage == 0) {
+    return value;
+  }
+
+  uint32_t clamped = value;
+  if (clamped < ADC_MIN_VALUE) {
+    clamped = ADC_MIN_VALUE;
+  }
+  if (clamped > ADC_MAX_VALUE) {
+    clamped = ADC_MAX_VALUE;
+  }
+
+  if (clamped >= deadzoneLowerBound && clamped <= deadzoneUpperBound) {
+    return centerValue;
+  }
+
+  if (!normalizeOutsideDeadzone) {
+    return clamped;
+  }
+
+  if (clamped < deadzoneLowerBound) {
+    return mapRange(clamped, ADC_MIN_VALUE, deadzoneLowerBound, ADC_MIN_VALUE, centerValue);
+  }
+
+  return mapRange(clamped, deadzoneUpperBound, ADC_MAX_VALUE, centerValue, ADC_MAX_VALUE);
+}
+
 // [Vibe-Coded]
 uint32_t AnalogPinInput::applyHysteresisStep(uint32_t current, uint32_t target) const {
   if (hysteresisThreshold == 0) {
@@ -138,9 +206,10 @@ void AnalogPinInput::updateFilteredValue() {
   const uint32_t average = computeMovingAverage();
   const uint32_t median = computeMedianFromWindow();
   const uint32_t targetValue = selectRobustTarget(average, median);
+  const uint32_t deadzonedTargetValue = applyDeadzone(targetValue);
 
-  // 3) Apply dynamic smoothing.
-  filteredValue = applyHysteresisStep(filteredValue, targetValue);
+  // 3) Apply deadzone and dynamic smoothing.
+  filteredValue = applyHysteresisStep(filteredValue, deadzonedTargetValue);
 }
 
 }  // namespace borguino::inputs

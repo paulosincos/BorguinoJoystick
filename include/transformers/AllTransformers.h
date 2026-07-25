@@ -1,7 +1,6 @@
 #ifndef BORGUINO_TRANSFORMERS_ALL_TRANSFORMERS_H
 #define BORGUINO_TRANSFORMERS_ALL_TRANSFORMERS_H
 
-#include "transformers/AnalogDeadzoneFilter.h"
 #include "transformers/AnalogToDigitalTransform.h"
 #include "transformers/ComposedAnalogAxis.h"
 #include "transformers/DigitalToAnalogTransform.h"
