@@ -20,23 +20,11 @@ uint32_t mapRange(uint32_t value, uint32_t inMin, uint32_t inMax,
 
 }  // namespace
 
-AnalogPinInput::AnalogPinInput(uint8_t pin,
-                               bool filterValue,
-                               uint32_t hysteresisThreshold,
-                               uint32_t medianAvgThreshold,
-                               uint8_t deadzonePercentage,
-                               uint8_t centerPercentage,
-                               bool normalizeOutsideDeadzone)
-    : pin(pin),
-      filterValue(filterValue),
-      hysteresisThreshold(hysteresisThreshold),
-      medianAvgThreshold(medianAvgThreshold),
-      deadzonePercentage(deadzonePercentage > 100 ? 100 : deadzonePercentage),
-      normalizeOutsideDeadzone(normalizeOutsideDeadzone) {
-  initDeadzoneBounds(centerPercentage);
-
-  if (filterValue) {
-    initFilteredValue();
+AnalogPinInput::AnalogPinInput(uint8_t pin, const FilterOptions *filterOptions)
+    : pin(pin) {
+  if (filterOptions != nullptr) {
+    this->filterOptions = *filterOptions;
+    initFilteredMode();
   }
 }
 
@@ -61,7 +49,15 @@ void AnalogPinInput::update() {
   }
 }
 
-void AnalogPinInput::initFilteredValue() {
+void AnalogPinInput::initFilteredMode() {
+  filterValue = true;
+
+  if (this->filterOptions.centerPercentage > 100) {
+    this->filterOptions.centerPercentage = 100;
+  }
+
+  initDeadzoneBounds();
+
   for (size_t i = 0; i < SAMPLE_BUFFER_SIZE; ++i) {
     samples[i] = ADC_CENTER_VALUE;
   }
@@ -125,23 +121,24 @@ uint32_t AnalogPinInput::computeMedianFromWindow() const {
 uint32_t AnalogPinInput::selectRobustTarget(uint32_t average, uint32_t median) const {
   uint32_t targetValue = median;
   const uint32_t avgMedianDistance = (average > median) ? (average - median) : (median - average);
-  if (avgMedianDistance <= medianAvgThreshold) {
+  if (avgMedianDistance <= filterOptions.medianAvgThreshold) {
     targetValue = (average + median) / 2;
   }
   return targetValue;
 }
 
-void AnalogPinInput::initDeadzoneBounds(uint8_t centerPercentage) {
-  if (centerPercentage > 100) {
-    centerPercentage = 100;
+void AnalogPinInput::initDeadzoneBounds() {
+  if (this->filterOptions.deadzonePercentage > 100) {
+    this->filterOptions.deadzonePercentage = 100;
   }
 
   const uint32_t rangeMin = ADC_MIN_VALUE;
   const uint32_t rangeMax = ADC_MAX_VALUE;
   const uint32_t span = rangeMax - rangeMin;
-  centerValue = rangeMin + static_cast<uint32_t>((static_cast<uint64_t>(span) * centerPercentage) / 100);
+  
+  centerValue = rangeMin + static_cast<uint32_t>((static_cast<uint64_t>(span) * filterOptions.centerPercentage) / 100);
 
-  const uint32_t deadzoneRadius = static_cast<uint32_t>((static_cast<uint64_t>(span) * deadzonePercentage) / 200);
+  const uint32_t deadzoneRadius = static_cast<uint32_t>((static_cast<uint64_t>(span) * filterOptions.deadzonePercentage) / 200);
   deadzoneLowerBound = (centerValue > deadzoneRadius) ? (centerValue - deadzoneRadius) : rangeMin;
 
   const uint64_t upper64 = static_cast<uint64_t>(centerValue) + static_cast<uint64_t>(deadzoneRadius);
@@ -149,7 +146,7 @@ void AnalogPinInput::initDeadzoneBounds(uint8_t centerPercentage) {
 }
 
 uint32_t AnalogPinInput::applyDeadzone(uint32_t value) const {
-  if (deadzonePercentage == 0) {
+  if (filterOptions.deadzonePercentage == 0) {
     return value;
   }
 
@@ -165,7 +162,7 @@ uint32_t AnalogPinInput::applyDeadzone(uint32_t value) const {
     return centerValue;
   }
 
-  if (!normalizeOutsideDeadzone) {
+  if (!filterOptions.normalizeOutsideDeadzone) {
     return clamped;
   }
 
@@ -178,7 +175,7 @@ uint32_t AnalogPinInput::applyDeadzone(uint32_t value) const {
 
 // [Vibe-Coded]
 uint32_t AnalogPinInput::applyHysteresisStep(uint32_t current, uint32_t target) const {
-  if (hysteresisThreshold == 0) {
+  if (filterOptions.hysteresisThreshold == 0) {
     return target;
   }
 
@@ -187,11 +184,11 @@ uint32_t AnalogPinInput::applyHysteresisStep(uint32_t current, uint32_t target) 
   }
 
   const int32_t delta = int32_t(target) - int32_t(current);
-  if (delta > int32_t(hysteresisThreshold)) {
-    return current + hysteresisThreshold;
+  if (delta > int32_t(filterOptions.hysteresisThreshold)) {
+    return current + filterOptions.hysteresisThreshold;
   }
-  if (delta < -int32_t(hysteresisThreshold)) {
-    return current - hysteresisThreshold;
+  if (delta < -int32_t(filterOptions.hysteresisThreshold)) {
+    return current - filterOptions.hysteresisThreshold;
   }
 
   return current;

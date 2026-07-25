@@ -33,8 +33,10 @@ borg_inputs::DigitalPinInput hatInput3(6);
 borg_inputs::DigitalPinInput pinD10Input(10);
 borg_inputs::DigitalPinInput pinD11Input(11);
 
-borg_inputs::AnalogPinInput pinA0Input(A0, true, 4, 16, 4, 50, true);
-borg_inputs::AnalogPinInput pinA1Input(A1, true, 4, 16, 4, 50, true);
+const borg_inputs::AnalogPinInput::FilterOptions axisFilterOptions(4, 16, 4, 50, true);
+
+borg_inputs::AnalogPinInput pinA0Input(A0, &axisFilterOptions);
+borg_inputs::AnalogPinInput pinA1Input(A1, &axisFilterOptions);
 borg_inputs::AnalogPinInput pinA2Input(A2);
 borg_inputs::AnalogPinInput pinA3Input(A3);
 borg_inputs::AnalogPinInput pinA4Input(A4);

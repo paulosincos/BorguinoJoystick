@@ -12,13 +12,27 @@ namespace borguino::inputs {
 
 class AnalogPinInput : public SignalInput, public RangedValueProvider<uint32_t> {
 public:
-  explicit AnalogPinInput(uint8_t pin,
-                          bool filterValue = false,
-                          uint32_t hysteresisThreshold = 4,
-                          uint32_t medianAvgThreshold = 16,
-                          uint8_t deadzonePercentage = 0,
-                          uint8_t centerPercentage = 50,
-                          bool normalizeOutsideDeadzone = true);
+  struct FilterOptions {
+    explicit FilterOptions(uint32_t hysteresisThreshold = 4,
+                           uint32_t medianAvgThreshold = 16,
+                           uint8_t deadzonePercentage = 0,
+                           uint8_t centerPercentage = 50,
+                           bool normalizeOutsideDeadzone = true)
+        : hysteresisThreshold(hysteresisThreshold),
+          medianAvgThreshold(medianAvgThreshold),
+          deadzonePercentage(deadzonePercentage),
+          centerPercentage(centerPercentage),
+          normalizeOutsideDeadzone(normalizeOutsideDeadzone) {
+    }
+
+    uint32_t hysteresisThreshold;
+    uint32_t medianAvgThreshold;
+    uint8_t deadzonePercentage;
+    uint8_t centerPercentage;
+    bool normalizeOutsideDeadzone;
+  };
+
+  explicit AnalogPinInput(uint8_t pin, const FilterOptions *filterOptions = nullptr);
 
   uint32_t getValue() const override;
   void update() override;
@@ -29,15 +43,12 @@ public:
 protected:
   uint8_t pin;
 
-  bool filterValue;
+  bool filterValue = false;
   static constexpr size_t SAMPLE_BUFFER_SIZE = 7;
-  uint32_t hysteresisThreshold = 4;
-  uint32_t medianAvgThreshold = 16;
-  uint8_t deadzonePercentage = 0;
+  FilterOptions filterOptions;
   uint32_t centerValue = ADC_CENTER_VALUE;
   uint32_t deadzoneLowerBound = ADC_CENTER_VALUE;
   uint32_t deadzoneUpperBound = ADC_CENTER_VALUE;
-  bool normalizeOutsideDeadzone = true;
 
   uint16_t samples[SAMPLE_BUFFER_SIZE];
   size_t sampleCount = 0;
@@ -45,13 +56,13 @@ protected:
   uint32_t sampleSum = 0;
   uint32_t filteredValue = ADC_CENTER_VALUE;
 
-  void initFilteredValue();
+  void initFilteredMode();
   void updateFilteredValue();
   void pushSampleToWindow(uint16_t sample);
   uint32_t computeMovingAverage() const;
   uint32_t computeMedianFromWindow() const;
   uint32_t selectRobustTarget(uint32_t average, uint32_t median) const;
-  void initDeadzoneBounds(uint8_t centerPercentage);
+  void initDeadzoneBounds();
   uint32_t applyDeadzone(uint32_t value) const;
   uint32_t applyHysteresisStep(uint32_t current, uint32_t target) const;
 };
