@@ -10,8 +10,14 @@
 
 namespace borguino::inputs {
 
+/**
+ * @brief AnalogPinInput represents an analog input pin with optional filtering.
+ */
 class AnalogPinInput : public SignalInput, public RangedValueProvider<uint32_t> {
 public:
+  /**
+   * @brief FilterOptions struct defines the configuration for filtering analog input values.
+   */
   struct FilterOptions {
     explicit FilterOptions(uint32_t hysteresisThreshold = 4,
                            uint32_t medianAvgThreshold = 16,
@@ -32,12 +38,37 @@ public:
     bool normalizeOutsideDeadzone;
   };
 
+  /**
+   * @brief Construct a new Analog Pin Input object
+   * @param pin The analog pin number
+   * @param filterOptions Optional pointer to filter options (default is nullptr/filters disabled)
+   */
   explicit AnalogPinInput(uint8_t pin, const FilterOptions *filterOptions = nullptr);
 
+  /**
+   * @brief Get the current value of the analog pin
+   * @return The current analog value (e.g., 0 to 1023)
+   */
   uint32_t getValue() const override;
+
+  /**
+   * @brief Update the state of the analog pin input
+   *
+   * This method should be called regularly (e.g., in the main loop/engine)
+   * to update the state of the pin.
+   */
   void update() override;
 
+  /**
+   * @brief Get the minimum possible value of the analog pin
+   * @return The minimum analog value (e.g., 0)
+   */
   uint32_t minValue() const override;
+
+  /**
+   * @brief Get the maximum possible value of the analog pin
+   * @return The maximum analog value (e.g., 1023)
+   */
   uint32_t maxValue() const override;
 
 protected:
