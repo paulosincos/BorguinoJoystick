@@ -49,12 +49,14 @@ const size_t inputCount = sizeof(inputs) / sizeof(inputs[0]);
 
 ValueProvider<bool>* hatInputs[] = {&hatInput0, &hatInput1, &hatInput2, &hatInput3};
 
+borg_transformers::AnalogDeadzoneFilter pinA0FilteredInput(pinA0Input, 4, 50, true);
+borg_transformers::AnalogDeadzoneFilter pinA1FilteredInput(pinA1Input, 4, 50, true);
 borg_transformers::ComposedAnalogAxis pinA2A3Input(pinA2Input, pinA3Input);
 
 borg_outputs::JoystickButtonOutput joystickButtonOutput(joystick, 0, pinD2Input);
 borg_outputs::JoystickHatOutput joystickHatOutput(joystick, 0, hatInputs, 4, true);
-borg_outputs::JoystickRangedOutput joystickXAxisOutput(joystick, borg_outputs::XAxis, pinA0Input);
-borg_outputs::JoystickRangedOutput joystickYAxisOutput(joystick, borg_outputs::YAxis, pinA1Input);
+borg_outputs::JoystickRangedOutput joystickXAxisOutput(joystick, borg_outputs::XAxis, pinA0FilteredInput);
+borg_outputs::JoystickRangedOutput joystickYAxisOutput(joystick, borg_outputs::YAxis, pinA1FilteredInput);
 borg_outputs::JoystickRangedOutput joystickZAxisOutput(joystick, borg_outputs::ZAxis, pinA2A3Input);
 
 borg_outputs::KeyboardOutput keyboardOutput(pinD10Input, 'z');

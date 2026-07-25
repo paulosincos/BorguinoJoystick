@@ -28,7 +28,6 @@ protected:
   static constexpr size_t SAMPLE_BUFFER_SIZE = 7;
   static constexpr uint32_t HYSTERESIS_THRESHOLD = 4;
   static constexpr uint32_t MEDIAN_AVG_THRESHOLD = 16;
-  static constexpr uint32_t CENTER_DEADZONE = 24;
 
   uint16_t samples[SAMPLE_BUFFER_SIZE];
   size_t sampleCount = 0;
@@ -38,7 +37,6 @@ protected:
 
   void initFilteredValue();
   void updateFilteredValue();
-  uint32_t applyCenteredDeadzone(uint32_t value) const;
   void pushSampleToWindow(uint16_t sample);
   uint32_t computeMovingAverage() const;
   uint32_t computeMedianFromWindow() const;

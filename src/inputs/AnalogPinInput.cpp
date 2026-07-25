@@ -44,43 +44,6 @@ void AnalogPinInput::initFilteredValue() {
   filteredValue = ADC_CENTER_VALUE;
 }
 
-// [Vibe-Coded]
-uint32_t AnalogPinInput::applyCenteredDeadzone(uint32_t value) const {
-  uint32_t clampedValue = value;
-  if (clampedValue < ADC_MIN_VALUE) {
-    clampedValue = ADC_MIN_VALUE;
-  } else if (clampedValue > ADC_MAX_VALUE) {
-    clampedValue = ADC_MAX_VALUE;
-  }
-
-  const uint32_t lowerEdge = ADC_CENTER_VALUE - CENTER_DEADZONE;
-  const uint32_t upperEdge = ADC_CENTER_VALUE + CENTER_DEADZONE;
-
-  if (clampedValue >= lowerEdge && clampedValue <= upperEdge) {
-    return ADC_CENTER_VALUE;
-  }
-
-  if (clampedValue < lowerEdge) {
-    const uint32_t inputSpan = lowerEdge - ADC_MIN_VALUE;
-    if (inputSpan == 0) {
-      return ADC_MIN_VALUE;
-    }
-
-    const uint32_t outputSpan = ADC_CENTER_VALUE - ADC_MIN_VALUE;
-    const uint32_t offset = lowerEdge - clampedValue;
-    return ADC_CENTER_VALUE - ((offset * outputSpan) / inputSpan);
-  }
-
-  const uint32_t inputSpan = ADC_MAX_VALUE - upperEdge;
-  if (inputSpan == 0) {
-    return ADC_MAX_VALUE;
-  }
-
-  const uint32_t outputSpan = ADC_MAX_VALUE - ADC_CENTER_VALUE;
-  const uint32_t offset = clampedValue - upperEdge;
-  return ADC_CENTER_VALUE + ((offset * outputSpan) / inputSpan);
-}
-
 void AnalogPinInput::pushSampleToWindow(uint16_t sample) {
   if (sampleCount < SAMPLE_BUFFER_SIZE) {
     ++sampleCount;
@@ -168,9 +131,8 @@ void AnalogPinInput::updateFilteredValue() {
   const uint32_t median = computeMedianFromWindow();
   const uint32_t targetValue = selectRobustTarget(average, median);
 
-  // 3) Apply dynamic smoothing and then center deadzone remap.
+  // 3) Apply dynamic smoothing.
   filteredValue = applyHysteresisStep(filteredValue, targetValue);
-  filteredValue = applyCenteredDeadzone(filteredValue);
 }
 
 }  // namespace borguino::inputs
