@@ -7,12 +7,34 @@
 
 namespace borguino::transformers {
 
+/**
+ * @brief ComposedAnalogAxis combines two analog inputs into a single axis value.
+ */
 class ComposedAnalogAxis : public RangedValueProvider<uint32_t> {
 public:
+  /**
+   * @brief Construct a new ComposedAnalogAxis object
+   * @param rangeAInput The first RangedValueProvider<uint32_t> input
+   * @param rangeBInput The second RangedValueProvider<uint32_t> input
+   */
   ComposedAnalogAxis(RangedValueProvider<uint32_t> &rangeAInput, RangedValueProvider<uint32_t> &rangeBInput);
 
+  /**
+   * @brief Get the current value of the composed axis
+   * @return The current composed axis value
+   */
   uint32_t getValue() const override;
+
+  /**
+   * @brief Get the minimum possible value of the composed axis
+   * @return The minimum value of the composed axis
+   */
   uint32_t minValue() const override;
+
+  /**
+   * @brief Get the maximum possible value of the composed axis
+   * @return The maximum value of the composed axis
+   */
   uint32_t maxValue() const override;
 
 protected:
