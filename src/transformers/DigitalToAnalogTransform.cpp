@@ -44,7 +44,9 @@ uint32_t interpolateLinear(uint32_t start, uint32_t target, uint32_t elapsed, ui
 DigitalToAnalogTransform::DigitalToAnalogTransform(ValueProvider<bool> &input,
                                                    uint32_t minValue,
                                                    uint32_t maxValue,
-                                                   uint32_t activationTimeMs)
+                                                   uint32_t activationTimeMs,
+                                                   uint32_t falseValue,
+                                                   uint32_t trueValue)
     : input(input), activationTimeMs(activationTimeMs) {
   if (maxValue >= minValue) {
     minOutputValue = minValue;
@@ -54,7 +56,17 @@ DigitalToAnalogTransform::DigitalToAnalogTransform(ValueProvider<bool> &input,
     maxOutputValue = minValue;
   }
 
-  outputSpan = maxOutputValue - minOutputValue;
+  if (falseValue == UINT32_MAX) {
+    falseValue = minOutputValue;
+  }
+
+  if (trueValue == UINT32_MAX) {
+    trueValue = maxOutputValue;
+  }
+
+  falseOutputValue = clampToRange(falseValue, minOutputValue, maxOutputValue);
+  trueOutputValue = clampToRange(trueValue, minOutputValue, maxOutputValue);
+  outputSpan = absoluteDistance(falseOutputValue, trueOutputValue);
 }
 
 // [Vibe-Coded]
@@ -65,7 +77,7 @@ uint32_t DigitalToAnalogTransform::getValue() const {
   if (!initialized) {
     initialized = true;
     lastInputState = inputState;
-    currentValue = inputState ? maxOutputValue : minOutputValue;
+    currentValue = inputState ? trueOutputValue : falseOutputValue;
     transitionStartValue = currentValue;
     transitionTargetValue = currentValue;
     transitionStartMs = now;
@@ -85,7 +97,7 @@ uint32_t DigitalToAnalogTransform::getValue() const {
   }
 
   if (activationTimeMs == 0) {
-    currentValue = inputState ? maxOutputValue : minOutputValue;
+    currentValue = inputState ? trueOutputValue : falseOutputValue;
     lastInputState = inputState;
     transitionStartValue = currentValue;
     transitionTargetValue = currentValue;
@@ -95,7 +107,7 @@ uint32_t DigitalToAnalogTransform::getValue() const {
   }
 
   if (inputState != lastInputState) {
-    const uint32_t nextTarget = inputState ? maxOutputValue : minOutputValue;
+    const uint32_t nextTarget = inputState ? trueOutputValue : falseOutputValue;
     const uint32_t distance = absoluteDistance(currentValue, nextTarget);
 
     transitionStartValue = currentValue;
