@@ -24,8 +24,11 @@ uint32_t saturatingSum(uint32_t a, uint32_t b) {
 
 }  // namespace
 
-ComposedAnalogAxis::ComposedAnalogAxis(RangedValueProvider<uint32_t> &rangeAInput, RangedValueProvider<uint32_t> &rangeBInput)
-    : rangeAInput(rangeAInput), rangeBInput(rangeBInput) {
+ComposedAnalogAxis::ComposedAnalogAxis(
+  RangedValueProvider<uint32_t> &rangeAInput,
+  RangedValueProvider<uint32_t> &rangeBInput,
+  CompositionMode mode)
+  : rangeAInput(rangeAInput), rangeBInput(rangeBInput), mode(mode) {
   rangeAMin = this->rangeAInput.minValue();
   rangeBMin = this->rangeBInput.minValue();
 
@@ -40,12 +43,19 @@ ComposedAnalogAxis::ComposedAnalogAxis(RangedValueProvider<uint32_t> &rangeAInpu
 }
 
 uint32_t ComposedAnalogAxis::getValue() const {
-  const int64_t center = static_cast<int64_t>(axisCenterValue);
-  const int64_t normalizedA = static_cast<int64_t>(normalizedValue(rangeAInput.getValue(), rangeAMin, rangeASpan));
-  const int64_t normalizedB = static_cast<int64_t>(normalizedValue(rangeBInput.getValue(), rangeBMin, rangeBSpan));
+  const uint32_t normalizedA = normalizedValue(rangeAInput.getValue(), rangeAMin, rangeASpan);
+  const uint32_t normalizedB = normalizedValue(rangeBInput.getValue(), rangeBMin, rangeBSpan);
 
-  // A before B: A pushes to lower values, B pushes to higher values.
-  int64_t composed = center + normalizedB - normalizedA;
+  if (mode == CompositionMode::FullRange) {
+    // Full-range mode: both minimum inputs map to the minimum output.
+    const uint32_t composed = saturatingSum(normalizedA, normalizedB);
+    return (composed <= axisMaxValue) ? composed : axisMaxValue;
+  }
+
+  const int64_t center = static_cast<int64_t>(axisCenterValue);
+
+  // Centered mode: A pushes lower than center, B pushes higher than center.
+  int64_t composed = center + static_cast<int64_t>(normalizedB) - static_cast<int64_t>(normalizedA);
   if (composed < 0) {
     composed = 0;
   } else if (composed > static_cast<int64_t>(axisMaxValue)) {
