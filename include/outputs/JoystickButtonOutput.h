@@ -8,10 +8,25 @@
 
 namespace borguino::outputs {
 
+/**
+ * @brief Output that sends a joystick button press when the input value is true.
+ */
 class JoystickButtonOutput : public JoystickOutput {
 public:
+  /**
+   * @brief Construct a new JoystickButtonOutput object
+   * @param joystick The Joystick_ instance to send the output to
+   * @param buttonNumber The button number to send when the input value is true
+   * @param input The ValueProvider<bool> that provides the input value
+   */
   explicit JoystickButtonOutput(Joystick_ &joystick, uint8_t buttonNumber, ValueProvider<bool> &input);
 
+  /**
+   * @brief Update the state of the joystick button output
+   *
+   * This method should be called regularly (e.g., in the main loop/engine)
+   * to update the state of the output.
+   */
   void update() override;
 
 protected:
