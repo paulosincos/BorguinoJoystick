@@ -7,22 +7,33 @@
 
 namespace borguino::transformers {
 
+/**
+ * @brief AnalogToDigitalTransform converts an analog input value to a digital boolean output based on specified thresholds and hysteresis.
+ */
 class AnalogToDigitalTransform : public ValueProvider<bool> {
 public:
+
   explicit AnalogToDigitalTransform(RangedValueProvider<uint32_t> &input,
-                                    uint8_t thresholdPercentage = 50,
+                                    uint8_t trueRangeStartPercentage = 50,
+                                    uint8_t trueRangeEndPercentage = 100,
                                     uint8_t hysteresisPercentage = 1);
 
+  /**
+   * @brief Get the current digital output value based on the analog input and thresholds.
+   * @return The current boolean output value (true or false)
+   */
   bool getValue() const override;
 
 protected:
   RangedValueProvider<uint32_t> &input;
-  uint32_t minValue = 0;
-  uint32_t maxValue = 0;
-  uint32_t switchValue = 0;
+  uint32_t trueRangeStartValue = 0;
+  uint32_t trueRangeEndValue = 0;
   uint32_t hysteresisOffset = 0;
+  uint32_t startOnThreshold = 0;
+  uint32_t endOnThreshold = 0;
+  uint32_t startOffThreshold = 0;
+  uint32_t endOffThreshold = 0;
   mutable bool state = false;
-  mutable bool stateInitialized = false;
 };
 
 }  // namespace borguino::transformers

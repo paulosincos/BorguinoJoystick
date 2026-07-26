@@ -1,47 +1,72 @@
 #include "transformers/AnalogToDigitalTransform.h"
 
+#include <algorithm>
+
 namespace borguino::transformers {
 
-AnalogToDigitalTransform::AnalogToDigitalTransform(RangedValueProvider<uint32_t> &input,
-                                                   uint8_t thresholdPercentage,
-                                                   uint8_t hysteresisPercentage)
-    : input(input) {
-  if (thresholdPercentage > 100) {
-    thresholdPercentage = 100;
-  }
-  if (hysteresisPercentage > 100) {
-    hysteresisPercentage = 100;
-  }
+namespace {
 
-  minValue = this->input.minValue();
-  maxValue = this->input.maxValue();
-  const uint32_t span = (maxValue >= minValue) ? (maxValue - minValue) : 0;
-
-  switchValue = minValue + static_cast<uint32_t>((static_cast<uint64_t>(span) * thresholdPercentage) / 100);
-  hysteresisOffset = static_cast<uint32_t>((static_cast<uint64_t>(span) * hysteresisPercentage) / 100);
+uint8_t clampPercentage(uint8_t percentage) {
+  return (percentage > 100) ? 100 : percentage;
 }
 
+uint32_t scaleRangeValue(uint32_t minValue, uint32_t maxValue, uint8_t percentage) {
+  const uint32_t span = (maxValue >= minValue) ? (maxValue - minValue) : 0;
+  return minValue + static_cast<uint32_t>((static_cast<uint64_t>(span) * clampPercentage(percentage)) / 100);
+}
+
+uint32_t scaleOffset(uint32_t minValue, uint32_t maxValue, uint8_t percentage) {
+  const uint32_t span = (maxValue >= minValue) ? (maxValue - minValue) : 0;
+  return static_cast<uint32_t>((static_cast<uint64_t>(span) * clampPercentage(percentage)) / 100);
+}
+
+uint32_t addSaturated(uint32_t value, uint32_t offset, uint32_t maximum) {
+  const uint64_t result = static_cast<uint64_t>(value) + static_cast<uint64_t>(offset);
+  return (result > maximum) ? maximum : static_cast<uint32_t>(result);
+}
+
+uint32_t subtractSaturated(uint32_t value, uint32_t offset, uint32_t minimum) {
+  return (value > offset) ? (value - offset) : minimum;
+}
+
+}  // namespace
+
 // [Vibe-Coded]
+AnalogToDigitalTransform::AnalogToDigitalTransform(RangedValueProvider<uint32_t> &input,
+                                                   uint8_t trueRangeStartPercentage,
+                                                   uint8_t trueRangeEndPercentage,
+                                                   uint8_t hysteresisPercentage)
+    : input(input),
+      trueRangeStartValue(scaleRangeValue(this->input.minValue(), this->input.maxValue(), trueRangeStartPercentage)),
+      trueRangeEndValue(scaleRangeValue(this->input.minValue(), this->input.maxValue(), trueRangeEndPercentage)),
+      hysteresisOffset(scaleOffset(this->input.minValue(), this->input.maxValue(), hysteresisPercentage)) {
+  const uint32_t minimum = this->input.minValue();
+  const uint32_t maximum = this->input.maxValue();
+
+  if (trueRangeStartValue > trueRangeEndValue) {
+    std::swap(trueRangeStartValue, trueRangeEndValue);
+  }
+
+  startOnThreshold = addSaturated(trueRangeStartValue, hysteresisOffset, maximum);
+  endOnThreshold = subtractSaturated(trueRangeEndValue, hysteresisOffset, minimum);
+  startOffThreshold = subtractSaturated(trueRangeStartValue, hysteresisOffset, minimum);
+  endOffThreshold = addSaturated(trueRangeEndValue, hysteresisOffset, maximum);
+
+  const uint32_t value = this->input.getValue();
+  state = value >= startOnThreshold && value <= endOnThreshold;
+}
+
 bool AnalogToDigitalTransform::getValue() const {
   const uint32_t value = input.getValue();
 
-  if (!stateInitialized) {
-    state = value >= switchValue;
-    stateInitialized = true;
-    return state;
-  }
-
   if (state) {
-    const uint32_t turnOffThreshold = (switchValue > hysteresisOffset) ? (switchValue - hysteresisOffset) : minValue;
-    if (value < turnOffThreshold) {
+    if (value < startOffThreshold || value > endOffThreshold) {
       state = false;
     }
     return state;
   }
 
-  const uint64_t onThreshold64 = static_cast<uint64_t>(switchValue) + static_cast<uint64_t>(hysteresisOffset);
-  const uint32_t turnOnThreshold = (onThreshold64 > maxValue) ? maxValue : static_cast<uint32_t>(onThreshold64);
-  if (value > turnOnThreshold) {
+  if (value >= startOnThreshold && value <= endOnThreshold) {
     state = true;
   }
 
