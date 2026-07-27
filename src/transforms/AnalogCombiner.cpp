@@ -1,4 +1,4 @@
-#include "transforms/ComposedAnalogAxis.h"
+#include "transforms/AnalogCombiner.h"
 
 namespace borguino::transforms {
 
@@ -24,7 +24,7 @@ uint32_t saturatingSum(uint32_t a, uint32_t b) {
 
 }  // namespace
 
-ComposedAnalogAxis::ComposedAnalogAxis(
+AnalogCombiner::AnalogCombiner(
   RangedValueProvider<uint32_t> &rangeAInput,
   RangedValueProvider<uint32_t> &rangeBInput,
   CompositionMode mode)
@@ -42,7 +42,7 @@ ComposedAnalogAxis::ComposedAnalogAxis(
   axisMaxValue = saturatingSum(rangeASpan, rangeBSpan);
 }
 
-uint32_t ComposedAnalogAxis::getValue() const {
+uint32_t AnalogCombiner::getValue() const {
   const uint32_t normalizedA = normalizedValue(rangeAInput.getValue(), rangeAMin, rangeASpan);
   const uint32_t normalizedB = normalizedValue(rangeBInput.getValue(), rangeBMin, rangeBSpan);
 
@@ -65,11 +65,11 @@ uint32_t ComposedAnalogAxis::getValue() const {
   return static_cast<uint32_t>(composed);
 }
 
-uint32_t ComposedAnalogAxis::minValue() const {
+uint32_t AnalogCombiner::minValue() const {
   return 0;
 }
 
-uint32_t ComposedAnalogAxis::maxValue() const {
+uint32_t AnalogCombiner::maxValue() const {
   return axisMaxValue;
 }
 

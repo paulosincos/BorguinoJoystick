@@ -1,5 +1,5 @@
-#ifndef BORGUINO_TRANSFORMS_COMPOSED_ANALOG_AXIS_H
-#define BORGUINO_TRANSFORMS_COMPOSED_ANALOG_AXIS_H
+#ifndef BORGUINO_TRANSFORMS_ANALOG_COMBINER_H
+#define BORGUINO_TRANSFORMS_ANALOG_COMBINER_H
 
 #include <cstdint>
 
@@ -8,9 +8,9 @@
 namespace borguino::transforms {
 
 /**
- * @brief ComposedAnalogAxis combines two analog inputs into a single axis value.
+ * @brief Combines two analog inputs into a single axis value.
  */
-class ComposedAnalogAxis : public RangedValueProvider<uint32_t> {
+class AnalogCombiner : public RangedValueProvider<uint32_t> {
 public:
   /**
    * @brief Enum representing the composition behavior for combining inputs.
@@ -23,12 +23,12 @@ public:
   };
 
   /**
-   * @brief Construct a new ComposedAnalogAxis object
+   * @brief Construct a new AnalogAxisCombiner object
    * @param rangeAInput The first RangedValueProvider<uint32_t> input
    * @param rangeBInput The second RangedValueProvider<uint32_t> input
    * @param mode Composition behavior for combining inputs
    */
-  ComposedAnalogAxis(
+  AnalogCombiner(
       RangedValueProvider<uint32_t> &rangeAInput,
       RangedValueProvider<uint32_t> &rangeBInput,
       CompositionMode mode = CompositionMode::Centered);

@@ -51,7 +51,7 @@ const size_t inputCount = sizeof(inputs) / sizeof(inputs[0]);
 
 ValueProvider<bool>* hatInputs[] = {&hatInput0, &hatInput1, &hatInput2, &hatInput3};
 
-borg_transforms::ComposedAnalogAxis pinA2A3Input(pinA2Input, pinA3Input);
+borg_transforms::AnalogCombiner pinA2A3Input(pinA2Input, pinA3Input);
 
 borg_outputs::JoystickButtonOutput joystickButtonOutput(joystick, 0, pinD2Input);
 borg_outputs::JoystickHatOutput joystickHatOutput(joystick, 0, hatInputs, 4, true);
