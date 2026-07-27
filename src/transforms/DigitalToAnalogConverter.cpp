@@ -1,4 +1,4 @@
-#include "transforms/DigitalToAnalogTransform.h"
+#include "transforms/DigitalToAnalogConverter.h"
 
 #include <Arduino.h>
 
@@ -41,7 +41,7 @@ uint32_t interpolateLinear(uint32_t start, uint32_t target, uint32_t elapsed, ui
 
 }  // namespace
 
-DigitalToAnalogTransform::DigitalToAnalogTransform(ValueProvider<bool> &input,
+DigitalToAnalogConverter::DigitalToAnalogConverter(ValueProvider<bool> &input,
                                                    uint32_t minValue,
                                                    uint32_t maxValue,
                                                    uint32_t activationTimeMs,
@@ -70,7 +70,7 @@ DigitalToAnalogTransform::DigitalToAnalogTransform(ValueProvider<bool> &input,
 }
 
 // [Vibe-Coded]
-uint32_t DigitalToAnalogTransform::getValue() const {
+uint32_t DigitalToAnalogConverter::getValue() const {
   const bool inputState = input.getValue();
   const uint32_t now = millis();
 
@@ -135,11 +135,11 @@ uint32_t DigitalToAnalogTransform::getValue() const {
   return currentValue;
 }
 
-uint32_t DigitalToAnalogTransform::minValue() const {
+uint32_t DigitalToAnalogConverter::minValue() const {
   return minOutputValue;
 }
 
-uint32_t DigitalToAnalogTransform::maxValue() const {
+uint32_t DigitalToAnalogConverter::maxValue() const {
   return maxOutputValue;
 }
 

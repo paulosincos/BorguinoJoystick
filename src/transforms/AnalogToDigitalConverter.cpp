@@ -1,4 +1,4 @@
-#include "transforms/AnalogToDigitalTransform.h"
+#include "transforms/AnalogToDigitalConverter.h"
 
 #include <algorithm>
 
@@ -32,7 +32,7 @@ uint32_t subtractSaturated(uint32_t value, uint32_t offset, uint32_t minimum) {
 }  // namespace
 
 // [Vibe-Coded]
-AnalogToDigitalTransform::AnalogToDigitalTransform(RangedValueProvider<uint32_t> &input,
+AnalogToDigitalConverter::AnalogToDigitalConverter(RangedValueProvider<uint32_t> &input,
                                                    uint8_t trueRangeStartPercentage,
                                                    uint8_t trueRangeEndPercentage,
                                                    uint8_t hysteresisPercentage)
@@ -56,7 +56,7 @@ AnalogToDigitalTransform::AnalogToDigitalTransform(RangedValueProvider<uint32_t>
   state = value >= startOnThreshold && value <= endOnThreshold;
 }
 
-bool AnalogToDigitalTransform::getValue() const {
+bool AnalogToDigitalConverter::getValue() const {
   const uint32_t value = input.getValue();
 
   if (state) {

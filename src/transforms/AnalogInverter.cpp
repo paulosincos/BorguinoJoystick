@@ -1,8 +1,8 @@
-#include "transforms/InvertAnalogTransform.h"
+#include "transforms/AnalogInverter.h"
 
 namespace borguino::transforms {
 
-InvertAnalogTransform::InvertAnalogTransform(RangedValueProvider<uint32_t> &input)
+AnalogInverter::AnalogInverter(RangedValueProvider<uint32_t> &input)
     : input(input) {
   rangeMin = input.minValue();
   rangeMax = input.maxValue();
@@ -13,7 +13,7 @@ InvertAnalogTransform::InvertAnalogTransform(RangedValueProvider<uint32_t> &inpu
   }
 }
 
-uint32_t InvertAnalogTransform::getValue() const {
+uint32_t AnalogInverter::getValue() const {
   const uint32_t value = input.getValue();
   if (value <= rangeMin) {
     return rangeMax;
@@ -24,11 +24,11 @@ uint32_t InvertAnalogTransform::getValue() const {
   return rangeMin + (rangeMax - value);
 }
 
-uint32_t InvertAnalogTransform::minValue() const {
+uint32_t AnalogInverter::minValue() const {
   return rangeMin;
 }
 
-uint32_t InvertAnalogTransform::maxValue() const {
+uint32_t AnalogInverter::maxValue() const {
   return rangeMax;
 }
 

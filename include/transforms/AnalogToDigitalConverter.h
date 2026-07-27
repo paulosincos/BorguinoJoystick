@@ -1,5 +1,5 @@
-#ifndef BORGUINO_TRANSFORMS_ANALOG_TO_DIGITAL_TRANSFORM_H
-#define BORGUINO_TRANSFORMS_ANALOG_TO_DIGITAL_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_ANALOG_TO_DIGITAL_CONVERTER_H
+#define BORGUINO_TRANSFORMS_ANALOG_TO_DIGITAL_CONVERTER_H
 
 #include <cstdint>
 
@@ -8,12 +8,12 @@
 namespace borguino::transforms {
 
 /**
- * @brief AnalogToDigitalTransform converts an analog input value to a digital boolean output based on specified thresholds and hysteresis.
+ * @brief converts an analog input value to a digital boolean output based on specified thresholds and hysteresis.
  */
-class AnalogToDigitalTransform : public ValueProvider<bool> {
+class AnalogToDigitalConverter : public ValueProvider<bool> {
 public:
 
-  explicit AnalogToDigitalTransform(RangedValueProvider<uint32_t> &input,
+  explicit AnalogToDigitalConverter(RangedValueProvider<uint32_t> &input,
                                     uint8_t trueRangeStartPercentage = 50,
                                     uint8_t trueRangeEndPercentage = 100,
                                     uint8_t hysteresisPercentage = 1);

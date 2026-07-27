@@ -1,5 +1,5 @@
-#ifndef BORGUINO_TRANSFORMS_DIGITAL_TO_ANALOG_TRANSFORM_H
-#define BORGUINO_TRANSFORMS_DIGITAL_TO_ANALOG_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_DIGITAL_TO_ANALOG_CONVERTER_H
+#define BORGUINO_TRANSFORMS_DIGITAL_TO_ANALOG_CONVERTER_H
 
 #include <cstdint>
 
@@ -11,10 +11,10 @@ namespace borguino::transforms {
 /**
  * @brief DigitalToAnalogTransform converts a digital boolean input value to an analog output value based on specified thresholds and activation time.
  */
-class DigitalToAnalogTransform : public RangedValueProvider<uint32_t> {
+class DigitalToAnalogConverter : public RangedValueProvider<uint32_t> {
 public:
   /**
-   * @brief Construct a new DigitalToAnalogTransform object
+   * @brief Construct a new DigitalToAnalogConverter object
    * @param input The ValueProvider<bool> that provides the input value
    * @param minValue The minimum output value (default: ADC_MIN_VALUE)
    * @param maxValue The maximum output value (default: ADC_MAX_VALUE)
@@ -22,7 +22,7 @@ public:
    * @param falseValue The output value when the input is false (default: minValue)
    * @param trueValue The output value when the input is true (default: maxValue)
    */
-  explicit DigitalToAnalogTransform(ValueProvider<bool> &input,
+  explicit DigitalToAnalogConverter(ValueProvider<bool> &input,
                                     uint32_t minValue = ADC_MIN_VALUE,
                                     uint32_t maxValue = ADC_MAX_VALUE,
                                     uint32_t activationTimeMs = 100,

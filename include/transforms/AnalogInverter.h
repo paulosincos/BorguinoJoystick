@@ -1,5 +1,5 @@
-#ifndef BORGUINO_TRANSFORMS_INVERT_ANALOG_TRANSFORM_H
-#define BORGUINO_TRANSFORMS_INVERT_ANALOG_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_ANALOG_INVERTER_H
+#define BORGUINO_TRANSFORMS_ANALOG_INVERTER_H
 
 #include <cstdint>
 
@@ -7,9 +7,9 @@
 
 namespace borguino::transforms {
 
-class InvertAnalogTransform : public RangedValueProvider<uint32_t> {
+class AnalogInverter : public RangedValueProvider<uint32_t> {
 public:
-  explicit InvertAnalogTransform(RangedValueProvider<uint32_t> &input);
+  explicit AnalogInverter(RangedValueProvider<uint32_t> &input);
 
   uint32_t getValue() const override;
   uint32_t minValue() const override;
