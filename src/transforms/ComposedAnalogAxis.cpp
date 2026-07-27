@@ -1,6 +1,6 @@
-#include "transformers/ComposedAnalogAxis.h"
+#include "transforms/ComposedAnalogAxis.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 namespace {
 
@@ -73,4 +73,4 @@ uint32_t ComposedAnalogAxis::maxValue() const {
   return axisMaxValue;
 }
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms

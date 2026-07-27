@@ -1,8 +1,8 @@
-#include "transformers/ToggleSwitchToPushButtonTransform.h"
+#include "transforms/ToggleSwitchToPushButtonTransform.h"
 
 #include <Arduino.h>
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 ToggleSwitchToPushButtonTransform::ToggleSwitchToPushButtonTransform(ValueProvider<bool> &input,
                                                                      uint32_t pushDurationMs)
@@ -35,4 +35,4 @@ bool ToggleSwitchToPushButtonTransform::getValue() const {
   return true;
 }
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms

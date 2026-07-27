@@ -1,6 +1,6 @@
-#include "transformers/InvertAnalogTransform.h"
+#include "transforms/InvertAnalogTransform.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 InvertAnalogTransform::InvertAnalogTransform(RangedValueProvider<uint32_t> &input)
     : input(input) {
@@ -32,4 +32,4 @@ uint32_t InvertAnalogTransform::maxValue() const {
   return rangeMax;
 }
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms

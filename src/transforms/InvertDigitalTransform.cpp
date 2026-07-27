@@ -1,6 +1,6 @@
-#include "transformers/InvertDigitalTransform.h"
+#include "transforms/InvertDigitalTransform.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 InvertDigitalTransform::InvertDigitalTransform(ValueProvider<bool> &input)
     : input(input) {}
@@ -9,4 +9,4 @@ bool InvertDigitalTransform::getValue() const {
   return !input.getValue();
 }
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms

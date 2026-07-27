@@ -1,11 +1,11 @@
-#ifndef BORGUINO_TRANSFORMERS_COMPOSED_ANALOG_AXIS_H
-#define BORGUINO_TRANSFORMERS_COMPOSED_ANALOG_AXIS_H
+#ifndef BORGUINO_TRANSFORMS_COMPOSED_ANALOG_AXIS_H
+#define BORGUINO_TRANSFORMS_COMPOSED_ANALOG_AXIS_H
 
 #include <cstdint>
 
 #include "ValueProvider.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 /**
  * @brief ComposedAnalogAxis combines two analog inputs into a single axis value.
@@ -64,6 +64,6 @@ protected:
   CompositionMode mode = CompositionMode::Centered;
 };
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms
 
 #endif

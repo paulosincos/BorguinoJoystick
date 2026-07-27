@@ -1,6 +1,6 @@
-#include "transformers/PushButtonToToggleSwitchTransform.h"
+#include "transforms/PushButtonToToggleSwitchTransform.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 PushButtonToToggleSwitchTransform::PushButtonToToggleSwitchTransform(ValueProvider<bool> &input, bool initialState)
     : input(input), lastInputState(input.getValue()), outputState(initialState) {}
@@ -16,4 +16,4 @@ bool PushButtonToToggleSwitchTransform::getValue() const {
   return outputState;
 }
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms

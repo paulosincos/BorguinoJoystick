@@ -1,11 +1,11 @@
-#ifndef BORGUINO_TRANSFORMERS_ANALOG_TO_DIGITAL_TRANSFORM_H
-#define BORGUINO_TRANSFORMERS_ANALOG_TO_DIGITAL_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_ANALOG_TO_DIGITAL_TRANSFORM_H
+#define BORGUINO_TRANSFORMS_ANALOG_TO_DIGITAL_TRANSFORM_H
 
 #include <cstdint>
 
 #include "ValueProvider.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 /**
  * @brief AnalogToDigitalTransform converts an analog input value to a digital boolean output based on specified thresholds and hysteresis.
@@ -36,6 +36,6 @@ protected:
   mutable bool state = false;
 };
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms
 
 #endif

@@ -1,9 +1,9 @@
-#ifndef BORGUINO_TRANSFORMERS_INVERT_DIGITAL_TRANSFORM_H
-#define BORGUINO_TRANSFORMERS_INVERT_DIGITAL_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_INVERT_DIGITAL_TRANSFORM_H
+#define BORGUINO_TRANSFORMS_INVERT_DIGITAL_TRANSFORM_H
 
 #include "ValueProvider.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 class InvertDigitalTransform : public ValueProvider<bool> {
 public:
@@ -15,6 +15,6 @@ protected:
   ValueProvider<bool> &input;
 };
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms
 
 #endif

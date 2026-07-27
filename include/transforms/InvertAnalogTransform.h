@@ -1,11 +1,11 @@
-#ifndef BORGUINO_TRANSFORMERS_INVERT_ANALOG_TRANSFORM_H
-#define BORGUINO_TRANSFORMERS_INVERT_ANALOG_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_INVERT_ANALOG_TRANSFORM_H
+#define BORGUINO_TRANSFORMS_INVERT_ANALOG_TRANSFORM_H
 
 #include <cstdint>
 
 #include "ValueProvider.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 class InvertAnalogTransform : public RangedValueProvider<uint32_t> {
 public:
@@ -21,6 +21,6 @@ protected:
   uint32_t rangeMax = 0;
 };
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms
 
 #endif

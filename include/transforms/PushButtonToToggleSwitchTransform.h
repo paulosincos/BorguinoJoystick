@@ -1,9 +1,9 @@
-#ifndef BORGUINO_TRANSFORMERS_PUSH_BUTTON_TO_TOGGLE_SWITCH_TRANSFORM_H
-#define BORGUINO_TRANSFORMERS_PUSH_BUTTON_TO_TOGGLE_SWITCH_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_PUSH_BUTTON_TO_TOGGLE_SWITCH_TRANSFORM_H
+#define BORGUINO_TRANSFORMS_PUSH_BUTTON_TO_TOGGLE_SWITCH_TRANSFORM_H
 
 #include "ValueProvider.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 class PushButtonToToggleSwitchTransform : public ValueProvider<bool> {
 public:
@@ -17,6 +17,6 @@ protected:
   mutable bool outputState = false;
 };
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms
 
 #endif

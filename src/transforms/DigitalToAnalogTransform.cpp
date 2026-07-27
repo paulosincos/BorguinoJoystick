@@ -1,8 +1,8 @@
-#include "transformers/DigitalToAnalogTransform.h"
+#include "transforms/DigitalToAnalogTransform.h"
 
 #include <Arduino.h>
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 namespace {
 
@@ -143,4 +143,4 @@ uint32_t DigitalToAnalogTransform::maxValue() const {
   return maxOutputValue;
 }
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms

@@ -1,8 +1,8 @@
-#include "transformers/AnalogToDigitalTransform.h"
+#include "transforms/AnalogToDigitalTransform.h"
 
 #include <algorithm>
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 namespace {
 
@@ -73,4 +73,4 @@ bool AnalogToDigitalTransform::getValue() const {
   return state;
 }
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms

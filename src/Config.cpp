@@ -4,14 +4,14 @@
 #include "Config.h"
 #include "inputs/AllInputs.h"
 #include "outputs/AllOutputs.h"
-#include "transformers/AllTransformers.h"
+#include "transforms/Alltransforms.h"
 #include "SignalInput.h"
 #include "SignalOutput.h"
 #include "ValueProvider.h"
 
 namespace borg_inputs = borguino::inputs;
 namespace borg_outputs = borguino::outputs;
-namespace borg_transformers = borguino::transformers;
+namespace borg_transforms = borguino::transforms;
 
 namespace borguino::config {
 
@@ -51,7 +51,7 @@ const size_t inputCount = sizeof(inputs) / sizeof(inputs[0]);
 
 ValueProvider<bool>* hatInputs[] = {&hatInput0, &hatInput1, &hatInput2, &hatInput3};
 
-borg_transformers::ComposedAnalogAxis pinA2A3Input(pinA2Input, pinA3Input);
+borg_transforms::ComposedAnalogAxis pinA2A3Input(pinA2Input, pinA3Input);
 
 borg_outputs::JoystickButtonOutput joystickButtonOutput(joystick, 0, pinD2Input);
 borg_outputs::JoystickHatOutput joystickHatOutput(joystick, 0, hatInputs, 4, true);

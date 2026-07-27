@@ -1,11 +1,11 @@
-#ifndef BORGUINO_TRANSFORMERS_TOGGLE_SWITCH_TO_PUSH_BUTTON_TRANSFORM_H
-#define BORGUINO_TRANSFORMERS_TOGGLE_SWITCH_TO_PUSH_BUTTON_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_TOGGLE_SWITCH_TO_PUSH_BUTTON_TRANSFORM_H
+#define BORGUINO_TRANSFORMS_TOGGLE_SWITCH_TO_PUSH_BUTTON_TRANSFORM_H
 
 #include <cstdint>
 
 #include "ValueProvider.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 class ToggleSwitchToPushButtonTransform : public ValueProvider<bool> {
 public:
@@ -22,6 +22,6 @@ protected:
   mutable uint32_t pulseStartedAtMs = 0;
 };
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms
 
 #endif

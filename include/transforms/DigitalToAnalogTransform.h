@@ -1,12 +1,12 @@
-#ifndef BORGUINO_TRANSFORMERS_DIGITAL_TO_ANALOG_TRANSFORM_H
-#define BORGUINO_TRANSFORMERS_DIGITAL_TO_ANALOG_TRANSFORM_H
+#ifndef BORGUINO_TRANSFORMS_DIGITAL_TO_ANALOG_TRANSFORM_H
+#define BORGUINO_TRANSFORMS_DIGITAL_TO_ANALOG_TRANSFORM_H
 
 #include <cstdint>
 
 #include "AdcSpecs.h"
 #include "ValueProvider.h"
 
-namespace borguino::transformers {
+namespace borguino::transforms {
 
 /**
  * @brief DigitalToAnalogTransform converts a digital boolean input value to an analog output value based on specified thresholds and activation time.
@@ -64,6 +64,6 @@ protected:
   mutable uint32_t transitionDurationMs = 0;
 };
 
-}  // namespace borguino::transformers
+}  // namespace borguino::transforms
 
 #endif
